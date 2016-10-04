@@ -9,16 +9,16 @@ import com.jayway.restassured.response.Response;
 
 public class IssueStatusGiven {
 
-	public String getJsonIssueStatus(IssueStatusGiven jiraapi, String issue){		
-		String authKey = Authentication.getAuthenticationKey();
+	public static String getJsonIssueStatus(String jiraUrl, String issue){		
+		String authKey = Authentication.getAuthKey();
 		Response rp = null;
 		try{
-		rp = RestAssured.given().headers("Content-Type","application/json").headers("cookie",authKey).get("http://localhost:8080/rest/api/2/issue/" + issue + "?expand=changelog");
+		rp = RestAssured.given().headers("Content-Type","application/json").headers("cookie",authKey).get(jiraUrl + "/rest/api/2/issue/" + issue + "?expand=changelog");
 		if(rp.getStatusCode() != 200){
-			authKey = Authentication.getAuthenticationKey();
+			authKey = Authentication.getAuthKey();
 		}
 		}catch(Exception e){
-			authKey = Authentication.getAuthenticationKey();
+			authKey = Authentication.getAuthKey();
 		}
 		return rp.getBody().asString();
 	}
@@ -26,19 +26,19 @@ public class IssueStatusGiven {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		IssueStatusGiven obj = new IssueStatusGiven();
-		String json = obj.getJsonIssueStatus(obj, "CROS-3");
+		String json = getJsonIssueStatus("", "CROS-3");
 		System.out.println(json);		
-		String totalComments = obj.getTotalCommentsCount(json);
+		String totalComments = getTotalCommentsCount(json);
 		System.out.println("Total comments : " + totalComments);
-		String resturnMessage = obj.getNewComment(json, "CROS-3");
+		String resturnMessage = getNewComment(json, "CROS-3");
 		System.out.println("New Comment : " + resturnMessage);
-		System.out.println("Change count : " + obj.getChangeCount(json));
-		String changeMessage = obj.getNewChanges(json, "CROS-3");
+		System.out.println("Change count : " + getChangeCount(json));
+		String changeMessage = getNewChanges(json, "CROS-3");
 		System.out.println("New Changes : " + changeMessage);		
-		System.out.println("Issue status : " + obj.getIssueStatus(json));
+		System.out.println("Issue status : " + getIssueStatus(json));
 	}
 	
-	public String getIssueStatus(String json){
+	public static String getIssueStatus(String json){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		JsonObject fieldsObject = jsonElement.getAsJsonObject().get("fields").getAsJsonObject();
@@ -51,7 +51,7 @@ public class IssueStatusGiven {
 	
 	
 	
-	public String getTotalCommentsCount(String json){
+	public static String getTotalCommentsCount(String json){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		JsonObject fieldsObject = jsonElement.getAsJsonObject().get("fields").getAsJsonObject();
@@ -59,14 +59,14 @@ public class IssueStatusGiven {
 		return totalComments;
 	}
 	
-	public String getChangeCount(String json){
+	public static String getChangeCount(String json){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		String totalComments = jsonElement.getAsJsonObject().get("changelog").getAsJsonObject().get("total").getAsString();
 		return totalComments;
 	}
 	
-	public String getNewComment(String json, String issue){
+	public static String getNewComment(String json, String issue){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		JsonObject fieldsObject = jsonElement.getAsJsonObject().get("fields").getAsJsonObject();
@@ -77,7 +77,7 @@ public class IssueStatusGiven {
 		return message;
 	}
 	
-	public String getNewChanges(String json, String issue){
+	public static String getNewChanges(String json, String issue){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		JsonElement fieldsObject = jsonElement.getAsJsonObject().get("changelog");

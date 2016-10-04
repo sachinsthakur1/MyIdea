@@ -9,14 +9,14 @@ import com.jayway.restassured.response.Response;
 
 public class IssueStatusAll {
 	
-	public String getTotalIssuesAllIssuesStatus(String json){
+	public static String getTotalIssuesAllIssuesStatus(String json){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		String totalIssues = jsonElement.getAsJsonObject().get("total").getAsString();
 		return totalIssues;
 	}
 	
-	public String getLatIssueAllIssuesStatus(String json){
+	public static String getLatIssueAllIssuesStatus(String json, String jiraProject){
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
 		JsonArray issueArray = jsonElement.getAsJsonObject().get("issues").getAsJsonArray();
@@ -24,30 +24,31 @@ public class IssueStatusAll {
 		String newIssueKey = issueArray.get(0).getAsJsonObject().get("key").getAsString();
 		String summery = fieldsObject.get("summary").getAsString();
 		String reporterName = fieldsObject.get("reporter").getAsJsonObject().get("name").getAsString();
-		String message = "New issue is created on Jira by " + reporterName + ". \"Issue ID\" : \"" + newIssueKey + "\", \"Issue Summery\" : \"" + summery + "\"";
+		String message = "New issue is created on Jira by \"" + reporterName + "\" under project " + jiraProject + ". \"Issue ID\" : \"" + newIssueKey + "\", \"Issue Summery\" : \"" + summery + "\"";
 		return message;
 	}
 	
-	public String getJsonAllIssueStatus(IssueStatusAll jiraapi){		
-		String authKey = Authentication.getAuthenticationKey();
+	public static String getJsonAllIssueStatus(String jiraUrl, String jiraProject){		
+		String authKey = Authentication.getAuthKey();
 		Response rp = null;
 		try{
-		rp = RestAssured.given().headers("Content-Type","application/json").headers("cookie",authKey).get("http://localhost:8080/rest/api/2/search?jql=project=CROS");
+		rp = RestAssured.given().headers("Content-Type","application/json").headers("cookie",authKey).get(jiraUrl + "/rest/api/2/search?jql=project=" + jiraProject);
 		if(rp.getStatusCode() != 200){
-			authKey = Authentication.getAuthenticationKey();
+			authKey = Authentication.getAuthKey();
 		}
 		}catch(Exception e){
-			authKey = Authentication.getAuthenticationKey();
+			authKey = Authentication.getAuthKey();
 		}
 		return rp.getBody().asString();
 	}
 	
 	public static void main(String[] args) {
-		IssueStatusAll jiraapi = new IssueStatusAll();
-		String allIssueJson = jiraapi.getJsonAllIssueStatus(jiraapi);
-		String totalIssues = jiraapi.getTotalIssuesAllIssuesStatus(allIssueJson);
+		Authentication.initialize("http://localhost:8080", "sachinsthakur", "Aindia#123");
+		Authentication.generateAuthenticationKey();
+		String allIssueJson = IssueStatusAll.getJsonAllIssueStatus("http://localhost:8080", "CROS");
+		String totalIssues = IssueStatusAll.getTotalIssuesAllIssuesStatus(allIssueJson);
 		System.out.println("Total issues raised : " + totalIssues);
-		String issueMessage = jiraapi.getLatIssueAllIssuesStatus(allIssueJson);
+		String issueMessage = IssueStatusAll.getLatIssueAllIssuesStatus(allIssueJson, "PROJ");
 		System.out.println("New issue : " + issueMessage);
 	}
 }
