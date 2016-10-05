@@ -5,12 +5,14 @@
 	<artifactId>MyIdeaPOC</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
-		<dependency>
-			<groupId>com.github.taksan</groupId>
-			<artifactId>skype-java-api</artifactId>
-			<version>1.4</version>
-		</dependency>
+		<!-- <dependency> <groupId>com.github.taksan</groupId> <artifactId>skype-java-api</artifactId> 
+			<version>1.4</version> </dependency> -->
 
+		<dependency>
+			<groupId>com.samczsun</groupId>
+			<artifactId>skype4j</artifactId>
+			<version>0.1.5</version>
+		</dependency>
 		<dependency>
 			<groupId>com.jayway.restassured</groupId>
 			<artifactId>rest-assured</artifactId>

@@ -28,9 +28,14 @@ public class GitHubApi {
 	}
 	
 	public static String getJsonSingleCommitStatus(String apiUrl, String gitHubLoginID, String authToken, String branchName, String commitID){
-		Response rp = RestAssured.given().header("Authorization","Bearer " + authToken)
+		Response rp = null;
+		try{
+		rp = RestAssured.given().header("Authorization","Bearer " + authToken)
 				.header("Content-Type","application/json")
 				.get(apiUrl + "/repos/" + gitHubLoginID + "/" + branchName + "/commits/" + commitID);
+		}catch(Exception e){
+			System.out.println("\"EXCEPTION\" : " + e.getMessage() + ". \"Stack Trace\" : " + e.getStackTrace());
+		}
 		return rp.getBody().asString(); 
 	}
 	
